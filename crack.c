@@ -8,14 +8,15 @@
 void cipher(string key, int key_number);
 int main(void)
 {
-    int i,j,k,jin_wei= 0;;
+    int i,j,jin_wei,o= 0;;
     // if(argc!=2)
     // {
     //     printf("Usage: ./crack hash\n");
     //     return 1;
     // }
+    string word="rfid";
 
-    for(i=1; i<4; i++)
+    for(i=1; i<5; i++)
     {
         char test[i];
 
@@ -28,20 +29,25 @@ int main(void)
 
         while(1)
         {
-            jin_wei=0;
+
             for(j=0; j<26; j++)
             {
                 test[0] = 'a'+j;
-                for(k=0; k<i; k++)
+                o = 0;
+                while(o<i)
                 {
-                    printf("%c", test[k]);
-
+                    if(test[o] != word[o])
+                    {
+                        break;
+                    }
+                    o++;
                 }
-                printf("\n");
+                if(o == i && word[o]=='\0')
+                    printf("%s", test);
             }
 
             test[0] = 'a'+j;
-
+            jin_wei=0;
             for(; jin_wei<i-1; jin_wei++)
             {
                 if(test[jin_wei]>'z')
