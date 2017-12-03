@@ -15,50 +15,84 @@ int main(int argc, string argv[])
         return 1;
     }
     char *word=argv[1];
+    // printf("%s", word);
     for(i=1; i<5; i++)
     {
-        char test[i];
-
+        char test[i+1];
+        test[i] ='\0';
 //        initial
         for(int test_number=0; test_number<i;  test_number++)
         {
-            test[test_number] = 'a';
+            test[test_number] = 'A';
         }
 
 
         while(1)
         {
 
-            for(j=0; j<26; j++)
+            for(j=0; j<52; j++)
             {
-                test[0] = 'a'+j;
+                if(j>25)
+                {
+                    test[0] = 'a'+j-26;
+                }
+                else
+                {
+                    test[0] = 'A'+j;
+                }
+
+                // for(int k=0; k<i; k++)
+                // {
+                //     printf("%c", test[k]);
+                // }
+                // printf("\n");
+
                 char *s = crypt(test, "50");
                 if(strcmp(s, word) == 0)
                 {
+                    // printf("%s\n",s);
                     for(int k=0; k<i; k++)
                     {
                         printf("%c", test[k]);
                     }
+                    printf("\n");
+                    return 0;
                 }
+                // if(strcmp(test, word) == 0)
+                // {
+                //     printf("hi");
+                //     for(int k=0; k<i; k++)
+                //     {
+                //         printf("%c", test[k]);
+                //     }
+                //     return 0;
+                // }
             }
 
-            test[0] = 'a'+j;
+            test[0] = 'a'+j-26;
             jin_wei=0;
             for(; jin_wei<i-1; jin_wei++)
             {
                 if(test[jin_wei]>'z')
                 {
-                    test[jin_wei]='a';
-                    test[jin_wei+1]+=1;
+                    test[jin_wei]='A';
+                    if(test[jin_wei+1] =='Z')
+                    {
+                        test[jin_wei+1] = 'a';
+                    }
+                    else
+                    {
+                        test[jin_wei+1]+=1;
+                    }
                 }
             }
             if(test[i-1]>'z')
             {
                 break;
             }
-
-
         }
+
+
 
     }
     return 0;
