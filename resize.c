@@ -10,15 +10,16 @@
 int main(int argc, char *argv[])
 {
     // ensure proper usage
-    if (argc != 3)
+    if (argc != 4)
     {
         fprintf(stderr, "Usage: ./copy infile outfile\n");
         return 1;
     }
 
     // remember filenames
-    char *infile = argv[1];
-    char *outfile = argv[2];
+    int factor = atoi(argv[1]);
+    char *infile = argv[2];
+    char *outfile = argv[3];
 
     // open input file
     FILE *inptr = fopen(infile, "r");
@@ -62,32 +63,39 @@ int main(int argc, char *argv[])
     fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
 
     // determine padding for scanlines
-    int padding =  (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int padding =  (4 - (factor * bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
     // iterate over infile's scanlines
     for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
     {
         // iterate over pixels in scanline
         RGBTRIPLE* buffer = (RGBTRIPLE*)malloc(bi.biWidth*sizeof(RGBTRIPLE));
+        RGBTRIPLE* pixels = buffer;
+        RGBTRIPLE* to_free = buffer;
         for (int j = 0; j < bi.biWidth; j++)
         {
-            // temporary storage
-
-            // read RGB triple from infile
             fread(buffer, sizeof(RGBTRIPLE), 1, inptr);
-
-            // write RGB triple to outfile
-            fwrite(buffer, sizeof(RGBTRIPLE), 1, outptr);
+            buffer = buffer + sizeof(RGBTRIPLE);
         }
-
+        for(int k=0; k<factor; k++)
+        {
+            pixels = to_free;
+            for (int j = 0; j < bi.biWidth; j++)
+            {
+                for(int n=0; n<factor; n++)
+                    fwrite(pixels, sizeof(RGBTRIPLE), 1, outptr);
+                pixels = pixels + sizeof(RGBTRIPLE);
+            }
+            for (int k = 0; k < padding; k++)
+            {
+                fputc(0x00, outptr);
+            }
+        }
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
 
         // then add it back (to demonstrate how)
-        for (int k = 0; k < padding; k++)
-        {
-            fputc(0x00, outptr);
-        }
-        free(buffer);
+
+        free(to_free);
     }
 
     // close infile
